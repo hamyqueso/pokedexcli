@@ -1,7 +1,19 @@
 package main
 
-import ("fmt")
+import (
+	"fmt"
+	"strings"
+)
+
+func cleanInput(text string) []string{
+	var stringSlice []string
+	for _, word := range strings.Fields(text){
+		stringSlice = append(stringSlice, strings.ToLower(word))
+	}
+	return stringSlice
+}
 
 func main() {
-	fmt.Println("Hello, World!")
+	fmt.Println(cleanInput("  Hello World  "))
+	fmt.Println(strings.TrimSpace("  hello  "))
 }
