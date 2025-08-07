@@ -1,10 +1,13 @@
 package main
 
 import (
-	"fmt"
-	"strings"
 	"bufio"
+	"encoding/json"
+	"fmt"
+	"io"
+	"net/http"
 	"os"
+	"strings"
 )
 
 func commandExit() error {
@@ -24,37 +27,74 @@ func commandHelp() error {
 	}
 	return nil
 }
+
+func commandMap() error {
+	req, err := http.NewRequest("GET", "https://pokeapi.co/api/v2/location/1/", nil)
+	if err != nil {
+		return fmt.Errorf("%w", err)
+	}
+
+	client := http.Client{}
+
+	res, err := client.Do(req)
+	if err != nil {
+		return fmt.Errorf("%w", err)
+	}
+	defer res.Body.Close()
+
+	data, err := io.ReadAll(res.Body)
+	if err != nil {
+		return fmt.Errorf("%w", err)
+	}
+
+	var location []location
+
+	if err := json.Unmarshal(data, &location); err != nil {
+		return fmt.Errorf("%w", err)
+	}
+	fmt.Println("this is the map function")
+	fmt.Println(location)
+	return nil
+
+}
+
 type cliCommand struct {
-	name string
+	name        string
 	description string
-	callback func() error
+	callback    func() error
 }
 
 var commands map[string]cliCommand
 
-func cleanInput(text string) []string{
+type location struct {
+	Name string `json:"name"`
+}
+
+func cleanInput(text string) []string {
 	var stringSlice []string
-	for _, word := range strings.Fields(text){
+	for _, word := range strings.Fields(text) {
 		stringSlice = append(stringSlice, strings.ToLower(word))
 	}
 	return stringSlice
 }
 
-
-
 func main() {
 	commands = map[string]cliCommand{
 		"help": {
-			name: "help",
+			name:        "help",
 			description: "Displays a Help Message",
-			callback: commandHelp,
-		}, 
+			callback:    commandHelp,
+		},
 		"exit": {
-			name: "exit",
+			name:        "exit",
 			description: "Exits the Pokedex",
-			callback: commandExit,
-		}, 
-
+			callback:    commandExit,
+		},
+		"map": {
+			name:        "map",
+			description: "Displays map locations",
+			callback:    commandMap,
+		},
 	}
 
 	scanner := bufio.NewScanner(os.Stdin)
