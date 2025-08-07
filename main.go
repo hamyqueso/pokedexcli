@@ -18,24 +18,22 @@ func commandExit() error {
 
 func commandHelp() error {
 	fmt.Println("Welcome to the Pokedex!")
-	fmt.Println("Usage:\n")
-	fmt.Println("help: Displays a help message")
+	fmt.Printf("Usage:\n\n")
+	// fmt.Println("help: Displays a help message")
 	for _, command := range commands {
-		if command.name != "help" {
-			fmt.Printf("%s: %s\n", command.name, command.description)
-		}
+		fmt.Printf("%s: %s\n", command.name, command.description)
 	}
 	return nil
 }
 
 func commandMap() error {
-	req, err := http.NewRequest("GET", "https://pokeapi.co/api/v2/location/1/", nil)
+
+	req, err := http.NewRequest("GET", "https://pokeapi.co/api/v2/location-area/", nil)
 	if err != nil {
 		return fmt.Errorf("%w", err)
 	}
 
 	client := http.Client{}
-
 	res, err := client.Do(req)
 	if err != nil {
 		return fmt.Errorf("%w", err)
@@ -46,14 +44,20 @@ func commandMap() error {
 	if err != nil {
 		return fmt.Errorf("%w", err)
 	}
-
-	var location []location
+	// fmt.Println(data)
+	var location locationArea
 
 	if err := json.Unmarshal(data, &location); err != nil {
+		fmt.Println("Error unmarshalling")
 		return fmt.Errorf("%w", err)
 	}
-	fmt.Println("this is the map function")
-	fmt.Println(location)
+
+	// fmt.Println(location)
+
+	for _, area := range location.Results {
+		fmt.Println(area.Name)
+	}
+
 	return nil
 
 }
@@ -66,8 +70,19 @@ type cliCommand struct {
 
 var commands map[string]cliCommand
 
-type location struct {
+type locationArea struct {
+	Next     string    `json:"next"`
+	Previous any       `json:"previous"`
+	Results  []results `json:"results"`
+}
+
+type results struct {
 	Name string `json:"name"`
+}
+
+type config struct {
+	Next     string
+	Previous string
 }
 
 func cleanInput(text string) []string {
@@ -80,6 +95,11 @@ func cleanInput(text string) []string {
 
 func main() {
 	commands = map[string]cliCommand{
+		"map": {
+			name:        "map",
+			description: "Displays map locations. Calling it again displays the next 20 locations",
+			callback:    commandMap,
+		},
 		"help": {
 			name:        "help",
 			description: "Displays a Help Message",
@@ -89,11 +109,6 @@ func main() {
 			name:        "exit",
 			description: "Exits the Pokedex",
 			callback:    commandExit,
-		},
-		"map": {
-			name:        "map",
-			description: "Displays map locations",
-			callback:    commandMap,
 		},
 	}
 
