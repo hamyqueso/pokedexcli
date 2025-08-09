@@ -2,21 +2,20 @@ package main
 
 import (
 	"bufio"
-	"encoding/json"
 	"fmt"
-	"io"
-	"net/http"
+	"github.com/hamyqueso/pokedexcli/internal/pokeapi"
 	"os"
 	"strings"
+	"time"
 )
 
-func commandExit() error {
+func commandExit(c *config) error {
 	fmt.Println("Closing the Pokedex... Goodbye!")
 	os.Exit(0)
 	return nil
 }
 
-func commandHelp() error {
+func commandHelp(c *config) error {
 	fmt.Println("Welcome to the Pokedex!")
 	fmt.Printf("Usage:\n\n")
 	// fmt.Println("help: Displays a help message")
@@ -26,46 +25,10 @@ func commandHelp() error {
 	return nil
 }
 
-func commandMap() error {
-
-	req, err := http.NewRequest("GET", "https://pokeapi.co/api/v2/location-area/", nil)
-	if err != nil {
-		return fmt.Errorf("%w", err)
-	}
-
-	client := http.Client{}
-	res, err := client.Do(req)
-	if err != nil {
-		return fmt.Errorf("%w", err)
-	}
-	defer res.Body.Close()
-
-	data, err := io.ReadAll(res.Body)
-	if err != nil {
-		return fmt.Errorf("%w", err)
-	}
-	// fmt.Println(data)
-	var location locationArea
-
-	if err := json.Unmarshal(data, &location); err != nil {
-		fmt.Println("Error unmarshalling")
-		return fmt.Errorf("%w", err)
-	}
-
-	// fmt.Println(location)
-
-	for _, area := range location.Results {
-		fmt.Println(area.Name)
-	}
-
-	return nil
-
-}
-
 type cliCommand struct {
 	name        string
 	description string
-	callback    func() error
+	callback    func(*config) error
 }
 
 var commands map[string]cliCommand
@@ -81,8 +44,9 @@ type results struct {
 }
 
 type config struct {
-	Next     string
-	Previous string
+	pokeApiClient        pokeapi.Client
+	nextLocationsUrl     *string
+	previousLocationsUrl *string
 }
 
 func cleanInput(text string) []string {
@@ -94,6 +58,13 @@ func cleanInput(text string) []string {
 }
 
 func main() {
+	pokeClient := pokeapi.NewClient(5 * time.Second)
+	c := config{
+		pokeApiClient:        pokeClient,
+		nextLocationsUrl:     nil,
+		previousLocationsUrl: nil,
+	}
+
 	commands = map[string]cliCommand{
 		"map": {
 			name:        "map",
@@ -118,7 +89,7 @@ func main() {
 		scanner.Scan()
 		text := scanner.Text()
 		if _, exists := commands[text]; exists {
-			commands[text].callback()
+			commands[text].callback(&c)
 		} else {
 			fmt.Println("Unknown command")
 		}
