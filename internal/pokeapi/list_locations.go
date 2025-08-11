@@ -20,7 +20,7 @@ func (c *Client) ListLocations(locationsURL *string) (LocationsResponse, error) 
 		return LocationsResponse{}, errors.New("error creating request")
 	}
 
-	fmt.Println("created request")
+	// fmt.Println("created request")
 
 	res, err := c.httpClient.Do(req)
 	if err != nil {
@@ -28,7 +28,7 @@ func (c *Client) ListLocations(locationsURL *string) (LocationsResponse, error) 
 		return LocationsResponse{}, errors.New("error getting response")
 	}
 
-	fmt.Printf("got response: %d", res.StatusCode)
+	// fmt.Printf("got response: %d", res.StatusCode)
 
 	defer res.Body.Close()
 
@@ -37,13 +37,13 @@ func (c *Client) ListLocations(locationsURL *string) (LocationsResponse, error) 
 		return LocationsResponse{}, errors.New("error reading response")
 	}
 
-	fmt.Println("read data")
+	// fmt.Println("read data")
 
 	var location LocationsResponse
 
 	err = json.Unmarshal(data, &location)
 	if err != nil {
-		return LocationsResponse{}, errors.New("Error unmarshalling")
+		return LocationsResponse{}, errors.New("error unmarshalling")
 	}
 
 	return location, nil

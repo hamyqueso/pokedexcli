@@ -3,10 +3,11 @@ package main
 import (
 	"bufio"
 	"fmt"
-	"github.com/hamyqueso/pokedexcli/internal/pokeapi"
 	"os"
 	"strings"
 	"time"
+
+	"github.com/hamyqueso/pokedexcli/internal/pokeapi"
 )
 
 func commandExit(c *config) error {
@@ -60,6 +61,11 @@ func main() {
 			name:        "map",
 			description: "Displays map locations. Calling it again displays the next 20 locations",
 			callback:    commandMap,
+		},
+		"mapb": {
+			name:        "mapb",
+			description: "Displays the previous 20 map locations",
+			callback:    commandMapB,
 		},
 		"help": {
 			name:        "help",
