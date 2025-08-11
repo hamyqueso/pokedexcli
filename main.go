@@ -33,16 +33,6 @@ type cliCommand struct {
 
 var commands map[string]cliCommand
 
-type locationArea struct {
-	Next     string    `json:"next"`
-	Previous any       `json:"previous"`
-	Results  []results `json:"results"`
-}
-
-type results struct {
-	Name string `json:"name"`
-}
-
 type config struct {
 	pokeApiClient        pokeapi.Client
 	nextLocationsUrl     *string
