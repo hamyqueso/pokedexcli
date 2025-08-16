@@ -1,3 +1,6 @@
+// Pacakge pokeapi handles the http requests to the pokemon api
+// found at https://pokeapi.co.
+
 package pokeapi
 
 import (
@@ -9,12 +12,22 @@ import (
 )
 
 func (c *Client) ListLocations(locationsURL *string) (LocationsResponse, error) {
-	url := "https://pokeapi.co/api/v2/location-area/"
-	// url := "https://google.com"
-	//
+	url := "https://pokeapi.co/api/v2/location-area/?offset=0&limit=20"
+	var location LocationsResponse
+
 	if locationsURL != nil {
 		url = *locationsURL
 	}
+
+	if data, ok := c.pokecache.Get(url); ok {
+		err := json.Unmarshal(data, &location)
+		if err != nil {
+			return LocationsResponse{}, errors.New("error unmarshalling")
+		}
+		fmt.Println("accessed cache")
+		return location, nil
+	}
+
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
 		return LocationsResponse{}, errors.New("error creating request")
@@ -39,12 +52,12 @@ func (c *Client) ListLocations(locationsURL *string) (LocationsResponse, error) 
 
 	// fmt.Println("read data")
 
-	var location LocationsResponse
-
 	err = json.Unmarshal(data, &location)
 	if err != nil {
 		return LocationsResponse{}, errors.New("error unmarshalling")
 	}
+
+	c.pokecache.Add(url, data)
 
 	return location, nil
 }

@@ -3,19 +3,20 @@ package main
 import (
 	"testing"
 )
-func TestCleanInput (t *testing.T) {
+
+func TestCleanInput(t *testing.T) {
 	cases := []struct {
-		input string
+		input    string
 		expected []string
 	}{
 		{
-			input: "   hello world   ",
+			input:    "   hello world   ",
 			expected: []string{"hello", "world"},
-		},{
-			input: " this is another test  ",
+		}, {
+			input:    " this is another test  ",
 			expected: []string{"this", "is", "another", "test"},
-		},{
-			input: "Last Test  here  ",
+		}, {
+			input:    "Last Test  here  ",
 			expected: []string{"last", "test", "here"},
 		},
 	}

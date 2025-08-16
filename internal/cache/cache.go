@@ -1,4 +1,5 @@
 // Package pokecache handles caching of data to speed up request service
+//
 
 package pokecache
 
@@ -36,7 +37,6 @@ func (c *Cache) Get(key string) ([]byte, bool) {
 }
 
 func (c *Cache) reapLoop(interval time.Duration) {
-
 	ticker := time.NewTicker(interval)
 	defer ticker.Stop()
 
@@ -52,7 +52,6 @@ func (c *Cache) reapLoop(interval time.Duration) {
 
 		c.Unlock()
 	}
-
 }
 
 func NewCache(interval time.Duration) Cache {
