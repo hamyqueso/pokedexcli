@@ -10,22 +10,6 @@ import (
 	"github.com/hamyqueso/pokedexcli/internal/pokeapi"
 )
 
-func commandExit(c *config, args ...string) error {
-	fmt.Println("Closing the Pokedex... Goodbye!")
-	os.Exit(0)
-	return nil
-}
-
-func commandHelp(c *config, args ...string) error {
-	fmt.Println("Welcome to the Pokedex!")
-	fmt.Printf("Usage:\n\n")
-	// fmt.Println("help: Displays a help message")
-	for _, command := range commands {
-		fmt.Printf("%s: %s\n", command.name, command.description)
-	}
-	return nil
-}
-
 type cliCommand struct {
 	name        string
 	description string
@@ -35,7 +19,7 @@ type cliCommand struct {
 var commands map[string]cliCommand
 
 type config struct {
-	pokeApiClient        pokeapi.Client
+	pokeAPIClient        pokeapi.Client
 	nextLocationsUrl     *string
 	previousLocationsUrl *string
 }
@@ -51,7 +35,7 @@ func cleanInput(text string) []string {
 func main() {
 	pokeClient := pokeapi.NewClient(5 * time.Second)
 	c := config{
-		pokeApiClient:        pokeClient,
+		pokeAPIClient:        pokeClient,
 		nextLocationsUrl:     nil,
 		previousLocationsUrl: nil,
 	}
@@ -71,6 +55,11 @@ func main() {
 			name:        "explore",
 			description: "displays the possible pokemon encounters at a specified area",
 			callback:    commandExplore,
+		},
+		"catch": {
+			name:        "catch",
+			description: "Attempts to catch named pokemon",
+			callback:    commandCatch,
 		},
 		"help": {
 			name:        "help",
@@ -100,6 +89,8 @@ func main() {
 		} else {
 			if text[0] == "explore" {
 				commands["explore"].callback(&c, text[1])
+			} else if text[0] == "catch" {
+				commands["catch"].callback(&c, text[1])
 			} else if _, exists := commands[text[0]]; exists {
 				fmt.Printf("The %s command does not take a second argument\n", text[0])
 			} else {

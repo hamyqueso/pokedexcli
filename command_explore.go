@@ -3,7 +3,7 @@ package main
 import "fmt"
 
 func commandExplore(c *config, args ...string) error {
-	encounters, err := c.pokeApiClient.ListEncounters(args[0])
+	encounters, err := c.pokeAPIClient.ListEncounters(args[0])
 	if err != nil {
 		return err
 	}

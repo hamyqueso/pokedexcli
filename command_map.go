@@ -6,7 +6,7 @@ import (
 
 func commandMap(c *config, args ...string) error { // fmt.Println(location)
 
-	location, err := c.pokeApiClient.ListLocations(c.nextLocationsUrl)
+	location, err := c.pokeAPIClient.ListLocations(c.nextLocationsUrl)
 	if err != nil {
 		return err
 	}
@@ -26,7 +26,7 @@ func commandMapB(c *config, args ...string) error {
 		fmt.Println("You're already on the first page")
 	} else {
 
-		location, err := c.pokeApiClient.ListLocations(c.previousLocationsUrl)
+		location, err := c.pokeAPIClient.ListLocations(c.previousLocationsUrl)
 		if err != nil {
 			return err
 		}
