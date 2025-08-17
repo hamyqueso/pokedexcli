@@ -12,6 +12,14 @@ func (c *Client) ListEncounters(locationName string) (EncountersResponse, error)
 
 	var encounters EncountersResponse
 
+	if data, exists := c.pokecache.Get(url); exists {
+		err := json.Unmarshal(data, &encounters)
+		if err != nil {
+			return EncountersResponse{}, errors.New("error unmarshhalling")
+		}
+		// fmt.Println("accessed cache")
+		return encounters, nil
+	}
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
 		return EncountersResponse{}, errors.New("error creating request")
@@ -32,6 +40,8 @@ func (c *Client) ListEncounters(locationName string) (EncountersResponse, error)
 	if err = json.Unmarshal(data, &encounters); err != nil {
 		return EncountersResponse{}, errors.New("error unmarshhalling")
 	}
+
+	c.pokecache.Add(url, data)
 
 	return encounters, nil
 }
