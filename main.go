@@ -10,13 +10,13 @@ import (
 	"github.com/hamyqueso/pokedexcli/internal/pokeapi"
 )
 
-func commandExit(c *config) error {
+func commandExit(c *config, args ...string) error {
 	fmt.Println("Closing the Pokedex... Goodbye!")
 	os.Exit(0)
 	return nil
 }
 
-func commandHelp(c *config) error {
+func commandHelp(c *config, args ...string) error {
 	fmt.Println("Welcome to the Pokedex!")
 	fmt.Printf("Usage:\n\n")
 	// fmt.Println("help: Displays a help message")
@@ -29,7 +29,7 @@ func commandHelp(c *config) error {
 type cliCommand struct {
 	name        string
 	description string
-	callback    func(*config) error
+	callback    func(*config, ...string) error
 }
 
 var commands map[string]cliCommand
@@ -67,6 +67,11 @@ func main() {
 			description: "Displays the previous 20 map locations",
 			callback:    commandMapB,
 		},
+		"explore": {
+			name:        "explore",
+			description: "displays the possible pokemon encounters at a specified area",
+			callback:    commandExplore,
+		},
 		"help": {
 			name:        "help",
 			description: "Displays a Help Message",
@@ -83,12 +88,23 @@ func main() {
 	for {
 		fmt.Print("Pokedex > ")
 		scanner.Scan()
-		text := scanner.Text()
-		if _, exists := commands[text]; exists {
-			commands[text].callback(&c)
+		text := cleanInput(scanner.Text())
+		if len(text) == 1 {
+			if text[0] == "explore" {
+				fmt.Println("The explore function requires a location argument")
+			} else if _, exists := commands[text[0]]; exists {
+				commands[text[0]].callback(&c)
+			} else {
+				fmt.Println("Unknown command")
+			}
 		} else {
-			fmt.Println("Unknown command")
+			if text[0] == "explore" {
+				commands["explore"].callback(&c, text[1])
+			} else if _, exists := commands[text[0]]; exists {
+				fmt.Printf("The %s command does not take a second argument\n", text[0])
+			} else {
+				fmt.Println("Unknown command")
+			}
 		}
 	}
-
 }

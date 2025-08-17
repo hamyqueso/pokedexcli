@@ -4,7 +4,7 @@ import (
 	"fmt"
 )
 
-func commandMap(c *config) error { // fmt.Println(location)
+func commandMap(c *config, args ...string) error { // fmt.Println(location)
 
 	location, err := c.pokeApiClient.ListLocations(c.nextLocationsUrl)
 	if err != nil {
@@ -19,10 +19,9 @@ func commandMap(c *config) error { // fmt.Println(location)
 	}
 
 	return nil
-
 }
 
-func commandMapB(c *config) error {
+func commandMapB(c *config, args ...string) error {
 	if c.previousLocationsUrl == nil {
 		fmt.Println("You're already on the first page")
 	} else {
