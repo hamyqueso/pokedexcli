@@ -20,8 +20,9 @@ var commands map[string]cliCommand
 
 type config struct {
 	pokeAPIClient        pokeapi.Client
-	nextLocationsUrl     *string
-	previousLocationsUrl *string
+	nextLocationsURL     *string
+	previousLocationsURL *string
+	caughtPokemon        map[string]pokeapi.PokemonResponse
 }
 
 func cleanInput(text string) []string {
@@ -36,8 +37,9 @@ func main() {
 	pokeClient := pokeapi.NewClient(5 * time.Second)
 	c := config{
 		pokeAPIClient:        pokeClient,
-		nextLocationsUrl:     nil,
-		previousLocationsUrl: nil,
+		nextLocationsURL:     nil,
+		previousLocationsURL: nil,
+		caughtPokemon:        make(map[string]pokeapi.PokemonResponse),
 	}
 
 	commands = map[string]cliCommand{
@@ -60,6 +62,16 @@ func main() {
 			name:        "catch",
 			description: "Attempts to catch named pokemon",
 			callback:    commandCatch,
+		},
+		"inspect": {
+			name:        "inspect",
+			description: "displays stats for caught Pokemon",
+			callback:    commandInspect,
+		},
+		"pokedex": {
+			name:        "pokedex",
+			description: "displays names of caught pokemon",
+			callback:    commandPokedex,
 		},
 		"help": {
 			name:        "help",
@@ -91,6 +103,8 @@ func main() {
 				commands["explore"].callback(&c, text[1])
 			} else if text[0] == "catch" {
 				commands["catch"].callback(&c, text[1])
+			} else if text[0] == "inspect" {
+				commands["inspect"].callback(&c, text[1])
 			} else if _, exists := commands[text[0]]; exists {
 				fmt.Printf("The %s command does not take a second argument\n", text[0])
 			} else {

@@ -6,13 +6,13 @@ import (
 
 func commandMap(c *config, args ...string) error { // fmt.Println(location)
 
-	location, err := c.pokeAPIClient.ListLocations(c.nextLocationsUrl)
+	location, err := c.pokeAPIClient.ListLocations(c.nextLocationsURL)
 	if err != nil {
 		return err
 	}
 
-	c.nextLocationsUrl = location.Next
-	c.previousLocationsUrl = location.Previous
+	c.nextLocationsURL = location.Next
+	c.previousLocationsURL = location.Previous
 
 	for _, area := range location.Results {
 		fmt.Println(area.Name)
@@ -22,17 +22,17 @@ func commandMap(c *config, args ...string) error { // fmt.Println(location)
 }
 
 func commandMapB(c *config, args ...string) error {
-	if c.previousLocationsUrl == nil {
+	if c.previousLocationsURL == nil {
 		fmt.Println("You're already on the first page")
 	} else {
 
-		location, err := c.pokeAPIClient.ListLocations(c.previousLocationsUrl)
+		location, err := c.pokeAPIClient.ListLocations(c.previousLocationsURL)
 		if err != nil {
 			return err
 		}
 
-		c.nextLocationsUrl = location.Next
-		c.previousLocationsUrl = location.Previous
+		c.nextLocationsURL = location.Next
+		c.previousLocationsURL = location.Previous
 
 		for _, area := range location.Results {
 			fmt.Println(area.Name)
